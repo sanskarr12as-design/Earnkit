@@ -1,0 +1,27 @@
+<!--@@EK-PREVIEW-START (build.py is part ko ignore karta hai)@@-->
+<div id="ek-prev" style="position:fixed;inset:0;z-index:2147483647;background:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column">
+<div style="padding:8px 10px;background:#4d202c;color:#fff;font-size:14px"><b>preview-helper.html (shared base - home screen dikhti hai)</b> - preview (internet chahiye)</div>
+<iframe id="ek-prev-f" style="flex:1;border:0;width:100%" src="https://sanskarr12as-design.github.io/Earnkit/?screen=home&only=home"></iframe>
+</div>
+<!--@@EK-PREVIEW-END@@-->
+<!--@@EK-BLOCK B900@@-->
+<script id="ek-preview-helper">
+(function(){
+var q=new URLSearchParams(location.search).get('screen');
+if(!q)return;
+var only=(new URLSearchParams(location.search).get('only')||q).split(',');
+function startLock(){setInterval(function(){try{if(typeof currentRoute!=='undefined'&&only.indexOf(currentRoute)<0)window.go(only[0])}catch(e){}},300)}
+var tries=0,done=false,t=setInterval(function(){
+ tries++; if(tries>60||done){clearInterval(t);return;}
+ var hit=false;
+ ['Claim bonus','Continue to EarnKit'].forEach(function(x){
+  var b=[].slice.call(document.querySelectorAll('button,a,[role=button]')).filter(function(e){return e.offsetParent&&e.textContent.trim()===x})[0];
+  if(b){hit=true;try{b.click()}catch(e){}}
+ });
+ if(!hit&&typeof window.go==='function'&&document.querySelector('.app,[data-screen]')){
+  var again=[].slice.call(document.querySelectorAll('button')).some(function(e){return e.offsetParent&&/^(Claim bonus|Continue to EarnKit)$/.test(e.textContent.trim())});
+  if(!again){try{window.go(q);done=true;startLock()}catch(e){}}
+ }
+},700);
+})();
+</script>
