@@ -1,0 +1,43 @@
+<!--@@EK-PREVIEW-START (build.py is part ko ignore karta hai)@@-->
+<div id="ek-prev" style="position:fixed;inset:0;z-index:2147483647;background:#fff;font-family:system-ui,sans-serif;display:flex;flex-direction:column">
+<div style="padding:8px 10px;background:#4d202c;color:#fff;font-size:14px"><b>withdraw-history.html</b> - preview (internet chahiye)</div>
+<iframe id="ek-prev-f" style="flex:1;border:0;width:100%" src="https://sanskarr12as-design.github.io/Earnkit/?screen=withdrawHistory&only=withdrawHistory"></iframe>
+</div>
+<!--@@EK-PREVIEW-END@@-->
+<!--@@EK-BLOCK B517@@-->
+<script id="ek-video-proof-central-history-bridge">
+(function(){
+  'use strict';
+  var frame=document.getElementById('ekVideoEarnFrame');
+  if(!frame||window.__EK_VIDEO_PROOF_CENTRAL_HISTORY__)return;
+  window.__EK_VIDEO_PROOF_CENTRAL_HISTORY__=true;
+  window.addEventListener('message',function(ev){
+    if(ev.source!==frame.contentWindow)return;
+    var m=ev.data;
+    if(typeof m==='string'){try{m=JSON.parse(m)}catch(_){return}}
+    if(!m||m.section!=='SubmitVideoProof'||m.event!=='historyChange'||!m.payload)return;
+    var list=Array.isArray(m.payload.history)?m.payload.history.slice(0,100):[];
+    state.videoProofHistory=list;
+    persist();
+    if(m.payload.added){
+      var item=list.find(function(x){return String(x.id)===String(m.payload.added)});
+      if(item){
+        state.videoProofLoggedIds=Array.isArray(state.videoProofLoggedIds)?state.videoProofLoggedIds:[];
+        if(state.videoProofLoggedIds.indexOf(String(item.id))<0){
+          state.videoProofLoggedIds.push(String(item.id));
+          state.videoProofLoggedIds=state.videoProofLoggedIds.slice(-100);
+          record('Video proof saved locally',0,'video-proof',String(item.platform||'Video')+' · '+String(item.link||''));
+        }
+      }
+    }
+  });
+  frame.addEventListener('load',function(){
+    /* The iframe reads its same-origin localStorage on boot. Only send a non-empty
+       parent copy, so a fresh parent state can never erase an older saved proof list. */
+    try{
+      var saved=Array.isArray(state.videoProofHistory)?state.videoProofHistory:null;
+      if(saved&&saved.length)frame.contentWindow.postMessage({section:'SubmitVideoProof',action:'set',data:{history:saved}},'*');
+    }catch(e){}
+  });
+})();
+</script>
